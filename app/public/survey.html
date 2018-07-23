@@ -22,10 +22,10 @@
 
     </div>
     <script>
-        $("#submit").on("click", function() {
-
-            //research how to do ajax calls again
-            $.post("/api/friends", function(data) {
+        $("#submit").on("click", function(event) {
+            event.preventDefault();
+            //create JSON object from questions and put it into newFriend
+            $.post("/api/friends", newFriend).then(function(data) {
                 $("#output").append(data);
             });
         });
