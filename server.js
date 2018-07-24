@@ -7,7 +7,7 @@ const addAPIRoutes = require("./app/routing/apiRoutes.js");
 const friends = require("./app/data/friends.js");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.ENV.PORT || 3000;
 
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(bodyparser.json());
