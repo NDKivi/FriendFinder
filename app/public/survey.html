@@ -24,32 +24,40 @@
 
     </div>
     <style>
-        /* The Modal (background) */
+        label {
+            display: block;
+            font-size: 1.3rem;
+            padding-top: 1rem;
+            padding-bottom: .5rem;
+        }
+
+        button {
+            margin-top: 1.5rem;
+        }
+
+        img {
+            max-width: 500px;
+        }
+
+        #warning {
+            color: red;
+        }
+
+        /* The Modal */
 
         .modal {
             display: none;
-            /* Hidden by default */
             position: fixed;
-            /* Stay in place */
             z-index: 1;
-            /* Sit on top */
             padding-top: 100px;
-            /* Location of the box */
             left: 0;
             top: 0;
             width: 100%;
-            /* Full width */
             height: 100%;
-            /* Full height */
             overflow: auto;
-            /* Enable scroll if needed */
             background-color: rgb(0, 0, 0);
-            /* Fallback color */
             background-color: rgba(0, 0, 0, 0.4);
-            /* Black w/ opacity */
         }
-
-        /* Modal Content */
 
         .modal-content {
             background-color: #fefefe;
@@ -58,8 +66,6 @@
             border: 1px solid #888;
             width: 80%;
         }
-
-        /* The Close Button */
 
         .close {
             color: #aaaaaa;
@@ -77,13 +83,9 @@
     </style>
 
     <h1>Survey</h1>
+    <h2>Find a new friend after just ten questions</h2>
+    <h3>Instructions: Respond to each question based on how strongly you agree or disagree with the given statement.</h3>
     <form>
-
-        <div class="name-question">
-            <label for="question-name">What is your name?</label>
-            <input id="question-name" type="text">
-        </div>
-
         <div class="survey-question">
             <label for="question-1">Sports are fun to watch.</label>
             <input name="question-1" id="question-1" type="radio" value="1">1 (Strongly Disagree)</input>
@@ -165,19 +167,15 @@
             <input name="question-10" id="question-10" type="radio" value="5">5 (Strongly Agree)</input>
         </div>
 
-        <button id="submit">Submit It</button>
+        <h5 id="warning"></h5>
     </form>
-
-    <div id="output">
-
-    </div>
+    <button id="submit">Get Friend</button>
     <script>
         $("document").ready(function () {
 
             $("#submit").on("click", function (event) {
                 event.preventDefault();
 
-                let name = $("#question-name").val();
                 let scores = [
                     parseInt($("#question-1:checked").val()),
                     parseInt($("#question-2:checked").val()),
@@ -190,26 +188,39 @@
                     parseInt($("#question-9:checked").val()),
                     parseInt($("#question-10:checked").val())
                 ];
-                //create JSON object from questions and put it into newFriend
-                let newFriend = {
-                    "name": name,
-                    "photo": "",
-                    "scores": scores
-                }
-                console.log("clicked");
 
-                $.ajax({
-                    type: "POST",
-                    url: "/api/friends",
-                    data: newFriend,
-                    success: function (data) {
-                        console.log(data);
-                        $("#match-name").text(data.name);
-                        $("#match-image").attr("src", data.photo);
-                        $("#myModal").show();
-                    },
-                    dataType: "json"
-                });
+                let allAnswered = true;
+                for (let i = 0; i < scores.length; i++) {
+                    if (isNaN(scores[i])) {
+                        allAnswered = false;
+                    }
+                }
+
+                if (allAnswered) {
+                    //create JSON object from questions and put it into newFriend
+                    let newFriend = {
+                        "name": "dummy",
+                        "photo": "http://dummy",
+                        "scores": scores
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/friends",
+                        data: newFriend,
+                        success: function (data) {
+                            console.log(data);
+                            $("#match-name").text(data.name);
+                            $("#match-image").attr("src", data.photo);
+                            $("#myModal").show();
+                        },
+                        dataType: "json"
+                    });
+                } else {
+                    $("#warning").text("Please answer all ten questions before submitting the form.");
+                }
+
+
             });
             $(".close").on("click", function (event) {
                 $("#myModal").hide();
